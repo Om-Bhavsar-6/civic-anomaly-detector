@@ -1,10 +1,9 @@
-# Civic Image Anomaly Detector
+Civic Image Anomaly Detector
 
 A machine learning system designed to detect anomalies in civic infrastructure images such as potholes, broken streetlights, damaged signs, and other urban issues.
 
-## Quick Start
-
-### Prerequisites
+ Quick Start
+ Prerequisites
 - Python 3.11+ installed with PATH configured
 - VSCode (recommended) or any text editor
 
@@ -22,22 +21,22 @@ A machine learning system designed to detect anomalies in civic infrastructure i
    pip install -r requirements.txt
    ```
 
-### Basic Usage
+ Basic Usage
 1. **Create sample data structure:**
    ```bash
    python main.py create-sample
    ```
 
-2. **Add images to folders:**
+   2.add images to folders:
    - Normal civic images → `sample_data/normal/`
    - Test images → `sample_data/test/`
 
-3. **Train the model:**
+3. Train the model:
    ```bash
    python main.py train --data_folder sample_data/normal
    ```
 
-4. **Detect anomalies:**
+4. Detect anomalies:
    ```bash
    # Single image
    python main.py detect --image sample_data/test/your_image.jpg
@@ -46,17 +45,17 @@ A machine learning system designed to detect anomalies in civic infrastructure i
    python main.py batch --folder sample_data/test --visualize
    ```
 
-## Detailed Guide
+ Detailed Guide
 See `VSCODE_GUIDE.md` for complete step-by-step instructions.
 
-## Features
-- **Anomaly Detection**: Identifies unusual patterns in civic infrastructure
-- **Classification**: Categorizes detected anomalies (potholes, graffiti, etc.)
-- **Batch Processing**: Analyze multiple images at once
-- **Visualization**: Generate plots showing detected anomalies
-- **Reporting**: Export detailed JSON reports
+ Features
+- Anomaly Detection: Identifies unusual patterns in civic infrastructure
+- Classification**: Categorizes detected anomalies (potholes, graffiti, etc.)
+- Batch Processing: Analyze multiple images at once
+- Visualization: Generate plots showing detected anomalies
+- Reporting: Export detailed JSON reports
 
-## Supported Anomaly Types
+ Supported Anomaly Types
 - Potholes
 - Broken streetlights
 - Damaged signs
@@ -65,7 +64,7 @@ See `VSCODE_GUIDE.md` for complete step-by-step instructions.
 - Cracked pavement
 - Other unclassified issues
 
-## Project Structure
+ Project Structure
 ```
 civic_anomaly_detector/
 ├── anomaly_detector.py    # Core detection logic
@@ -75,10 +74,10 @@ civic_anomaly_detector/
 └── VSCODE_GUIDE.md      # Detailed implementation guide
 ```
 
-## Requirements
+ Requirements
 See `requirements.txt` for complete list of dependencies.
 
-## 🎬 Live Demo
+ 🎬 Live Demo
 
 See the system in action:
 
@@ -129,11 +128,11 @@ pothole_damage.png   🚨 ANOMALY  graffiti           -0.006
 The Civic Anomaly Detector is working perfectly!
 ```
 
-## Contributing
+ Contributing
 Feel free to customize the detection parameters and add new anomaly types based on your specific needs.
 
-## License
+ License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
-**Om Bhavsar** - *Initial work* - [Om-Bhavsar-6](https://github.com/Om-Bhavsar-6)
+ Author
+Om Bhavsar - [Om-Bhavsar-6](https://github.com/Om-Bhavsar-6)
