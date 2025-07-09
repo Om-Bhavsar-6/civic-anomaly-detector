@@ -424,7 +424,9 @@ class CivicAnomalyDetector:
         # Save report
         if output_path:
             with open(output_path, 'w') as f:
-                json.dump(report, f, indent=2)
+                # Convert numpy types to Python types for JSON serialization
+                json_report = json.loads(json.dumps(report, default=str))
+                json.dump(json_report, f, indent=2)
             print(f"Report saved to {output_path}")
         
         return report
