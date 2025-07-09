@@ -127,7 +127,7 @@ class CivicAnomalyDetector:
                 for j in range(radius, image.shape[1] - radius):
                     center = image[i, j]
                     code = 0
-                    for k in range(n_points):
+                    for k in range(min(n_points, 8)):  # Limit to 8 points to prevent overflow
                         angle = 2 * np.pi * k / n_points
                         x = int(i + radius * np.cos(angle))
                         y = int(j + radius * np.sin(angle))
