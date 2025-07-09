@@ -78,8 +78,62 @@ civic_anomaly_detector/
 ## Requirements
 See `requirements.txt` for complete list of dependencies.
 
+## 🎬 Live Demo
+
+See the system in action:
+
+```bash
+python demo_for_github.py
+```
+
+### Demo Output:
+
+```
+============================================================
+  🏙️ CIVIC ANOMALY DETECTOR - LIVE DEMO
+============================================================
+This demonstration shows the civic anomaly detector in action!
+
+🎨 Creating demonstration images...
+   ✓ Created clean_street.png - Clean concrete street
+   ✓ Created pothole_damage.png - Street with pothole damage
+   ✓ Created graffiti_wall.png - Wall with red graffiti
+   ✓ Created broken_light.png - Broken streetlight
+   ✓ Created cracked_sidewalk.png - Cracked sidewalk
+
+🤖 INITIALIZING & TRAINING THE AI MODEL
+🔄 Training with 4 normal civic images...
+✅ Training completed successfully!
+
+🔍 SINGLE IMAGE ANALYSIS
+📸 Analyzing: pothole_damage.png
+🚨 Anomaly Detected: YES
+📊 Confidence Score: -0.0064
+🏷️ Anomaly Type: graffiti
+
+📊 BATCH ANALYSIS RESULTS
+🔄 Processed 5 civic infrastructure images
+🚨 Total anomalies detected: 2
+
+📋 DETAILED ANALYSIS REPORT:
+----------------------------------------------------------------------
+IMAGE NAME           STATUS     TYPE               SCORE   
+----------------------------------------------------------------------
+broken_light.png     ✅ NORMAL   pothole            0.011   
+cracked_sidewalk.png 🚨 ANOMALY  graffiti           -0.019  
+debris_road.png      ✅ NORMAL   graffiti           0.015   
+graffiti_wall.png    ✅ NORMAL   graffiti           0.053   
+pothole_damage.png   🚨 ANOMALY  graffiti           -0.006  
+
+🎉 DEMONSTRATION COMPLETE
+The Civic Anomaly Detector is working perfectly!
+```
+
 ## Contributing
 Feel free to customize the detection parameters and add new anomaly types based on your specific needs.
 
 ## License
-This project is for educational and civic improvement purposes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+**Om Bhavsar** - *Initial work* - [Om-Bhavsar-6](https://github.com/Om-Bhavsar-6)
