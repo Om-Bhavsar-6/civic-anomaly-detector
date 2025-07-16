@@ -1,0 +1,29 @@
+bh.OM.000\Desktop\OMM\civic_anamoly_detector\static\css\style.css
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.result-item {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.anomaly-score {
+    font-weight: bold;
+}
+
+.anomaly-true {
+    color: #dc3545;
+}
+
+.anomaly-false {
+    color: #198754;
+}
+
+#loading {
+    margin: 20px 0;
+}
