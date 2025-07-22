@@ -23,7 +23,7 @@ export type DetectAnomalyFromImageInput = z.infer<typeof DetectAnomalyFromImageI
 const DetectAnomalyFromImageOutputSchema = z.object({
   anomalies: z.array(
     z.string().describe('A description of a detected anomaly.')
-  ).describe('A list of detected anomalies in the image.')
+  ).describe('A list of detected anomalies in the image. If the image is normal and has no anomalies, return an empty array.')
 });
 export type DetectAnomalyFromImageOutput = z.infer<typeof DetectAnomalyFromImageOutputSchema>;
 
@@ -38,6 +38,7 @@ const detectAnomalyFromImagePrompt = ai.definePrompt({
   prompt: `You are an AI that detects anomalies in images of city infrastructure.
   Analyze the image and identify any anomalies, such as potholes, broken streetlights, graffiti, or other issues that need to be reported to the city.
   Return a list of short descriptions of each detected anomaly.
+  If the image appears normal with no anomalies, return an empty list.
   Image: {{media url=photoDataUri}}`
 });
 

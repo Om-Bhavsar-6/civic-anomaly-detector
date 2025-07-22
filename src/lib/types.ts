@@ -6,10 +6,6 @@ export interface Report {
   title: string;
   type: AnomalyType;
   description: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
   imageUrl: string;
   imageHint: string;
   status: ReportStatus;

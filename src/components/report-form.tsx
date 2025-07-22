@@ -6,7 +6,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import { Camera, MapPin, Loader2, Wand2, CheckCircle, Info } from 'lucide-react';
+import { Camera, Loader2, Wand2, CheckCircle, Info } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,9 +29,6 @@ type ReportFormValues = z.infer<typeof reportSchema>;
 export function ReportForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string[] | null>(null);
@@ -46,33 +43,6 @@ export function ReportForm() {
   });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleGetLocation = () => {
-    setIsGettingLocation(true);
-    setLocationError(null);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-          setIsGettingLocation(false);
-          toast({ title: "Success", description: "Location acquired successfully." });
-        },
-        (error) => {
-          setLocationError(error.message);
-          setIsGettingLocation(false);
-          toast({ variant: 'destructive', title: "Error", description: `Could not get location: ${error.message}` });
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    } else {
-      setLocationError("Geolocation is not supported by this browser.");
-      setIsGettingLocation(false);
-      toast({ variant: 'destructive', title: "Error", description: "Geolocation is not supported by this browser." });
-    }
-  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -100,10 +70,6 @@ export function ReportForm() {
   };
   
   const onSubmit: SubmitHandler<ReportFormValues> = async (data) => {
-    if (!location) {
-      toast({ variant: 'destructive', title: "Missing Location", description: "Please provide your location before submitting." });
-      return;
-    }
     setIsSubmitting(true);
     // Simulate submission
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -113,8 +79,8 @@ export function ReportForm() {
       description: "Thank you for helping improve your community. You will be redirected shortly.",
     });
 
-    // In a real app, you'd send all data (data, location, imagePreview) to a final submission action.
-    console.log({ ...data, location, image: undefined });
+    // In a real app, you'd send all data (data, imagePreview) to a final submission action.
+    console.log({ ...data, image: undefined });
     
     setTimeout(() => {
         router.push('/');
@@ -127,32 +93,7 @@ export function ReportForm() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
-              <h3 className="text-lg font-medium">1. Location</h3>
-              <p className="text-sm text-muted-foreground">
-                Use your device's GPS to tag the anomaly's location.
-              </p>
-              {location ? (
-                <Alert variant="default" className="bg-green-50 border-green-200">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertTitle className="text-green-800">Location Acquired</AlertTitle>
-                  <AlertDescription className="text-green-700">
-                    Lat: {location.lat.toFixed(5)}, Lng: {location.lng.toFixed(5)}
-                    <Button variant="link" size="sm" onClick={handleGetLocation} className="ml-2 h-auto p-0 text-green-700 hover:text-green-800">
-                      (Recapture)
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                <Button type="button" onClick={handleGetLocation} disabled={isGettingLocation} className="w-full">
-                  {isGettingLocation ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPin className="mr-2 h-4 w-4" />}
-                  Get Current Location
-                </Button>
-              )}
-              {locationError && <p className="text-sm font-medium text-destructive">{locationError}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium">2. Anomaly Photo</h3>
+              <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
               <p className="text-sm text-muted-foreground">
                 Upload a photo. Our AI will try to identify the issue.
               </p>
@@ -203,20 +144,20 @@ export function ReportForm() {
                   </Alert>
                )}
                {analysisResult && (
-                  <Alert variant="default" className={cn(analysisResult.length > 0 ? "bg-blue-50 border-blue-200" : "bg-orange-50 border-orange-200")}>
-                     {analysisResult.length > 0 ? <CheckCircle className="h-4 w-4 text-blue-600" /> : <Info className="h-4 w-4 text-orange-600" />}
-                    <AlertTitle className={cn(analysisResult.length > 0 ? "text-blue-800" : "text-orange-800")}>
-                      {analysisResult.length > 0 ? "Analysis Complete" : "No Anomalies Detected"}
+                  <Alert variant="default" className={cn(analysisResult.length > 0 ? "bg-blue-50 border-blue-200" : "bg-green-50 border-green-200")}>
+                     {analysisResult.length > 0 ? <Info className="h-4 w-4 text-blue-600" /> : <CheckCircle className="h-4 w-4 text-green-600" />}
+                    <AlertTitle className={cn(analysisResult.length > 0 ? "text-blue-800" : "text-green-800")}>
+                      {analysisResult.length > 0 ? "Anomalies Detected" : "Looking Good!"}
                     </AlertTitle>
-                    <AlertDescription className={cn(analysisResult.length > 0 ? "text-blue-700" : "text-orange-700")}>
-                        {analysisResult.length > 0 ? `Detected: ${analysisResult.join(', ')}` : "We couldn't auto-detect an issue. Please describe it below."}
+                    <AlertDescription className={cn(analysisResult.length > 0 ? "text-blue-700" : "text-green-700")}>
+                        {analysisResult.length > 0 ? `Detected: ${analysisResult.join(', ')}` : "We couldn't auto-detect an issue, the image looks normal. If you still see a problem, please describe it below."}
                     </AlertDescription>
                   </Alert>
                )}
             </div>
 
             <div className="space-y-2">
-                <h3 className="text-lg font-medium">3. Details</h3>
+                <h3 className="text-lg font-medium">2. Details</h3>
                 <p className="text-sm text-muted-foreground">
                     Provide a title and description for your report.
                 </p>
@@ -254,7 +195,7 @@ export function ReportForm() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting || isAnalyzing || isGettingLocation} className="w-full">
+            <Button type="submit" disabled={isSubmitting || isAnalyzing} className="w-full">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Submit Report
             </Button>
