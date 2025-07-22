@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 
 const placeholderReports: Report[] = [
-    { id: '1', title: 'Pothole on Elm Street', description: 'A large pothole is causing issues for drivers.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'pothole road', type: 'Pothole', status: 'Resolved', reportedAt: '2 days ago' },
-    { id: '2', title: 'Graffiti on Park Wall', description: 'Spray paint graffiti was found on the main park wall near the entrance.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'graffiti wall', type: 'Graffiti', status: 'In Progress', reportedAt: '5 hours ago' },
-    { id: '3', title: 'Broken Streetlight', description: 'The streetlight at the corner of 5th and Main is out.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'streetlight dark', type: 'Broken Streetlight', status: 'Received', reportedAt: '1 day ago' },
+    { id: '1', title: 'Pothole on MG Road', description: 'A large pothole near the metro station is causing traffic issues.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'pothole road', type: 'Pothole', status: 'Resolved', reportedAt: '2 days ago' },
+    { id: '2', title: 'Graffiti at Vishal Mega Mart', description: 'Graffiti was spray-painted on the front wall of the Vishal Mega Mart in Connaught Place.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'graffiti wall', type: 'Graffiti', status: 'In Progress', reportedAt: '5 hours ago' },
+    { id: '3', title: 'Broken Streetlight in Koramangala', description: 'The streetlight on 5th Block main road is not working.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'streetlight dark', type: 'Broken Streetlight', status: 'Received', reportedAt: '1 day ago' },
 ];
 
 const achievements = [
