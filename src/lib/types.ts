@@ -17,5 +17,6 @@ export interface Report {
   imageUrl: string;
   imageHint: string;
   status: ReportStatus;
-  reportedAt: Timestamp | Date | string; // Allow for Firestore Timestamp, client-side Date, and string formatting
+  reportedAt: Timestamp | Date | string; 
+  confidence?: number;
 }

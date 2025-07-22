@@ -3,7 +3,7 @@
 
 import { db, storage } from "@/lib/firebase";
 import { AnomalyType } from "@/lib/types";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { z } from "zod";
 
@@ -12,6 +12,7 @@ const reportSchema = z.object({
     anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
     title: z.string().min(1, "Title is required."),
     description: z.string().min(1, "Description is required."),
+    confidence: z.coerce.number(),
 });
 
 export async function submitReport(formData: FormData) {
@@ -20,6 +21,7 @@ export async function submitReport(formData: FormData) {
         anomalyType: formData.get('anomalyType'),
         title: formData.get('title'),
         description: formData.get('description'),
+        confidence: formData.get('confidence'),
     };
 
     const validatedFields = reportSchema.safeParse(rawFormData);
@@ -28,7 +30,7 @@ export async function submitReport(formData: FormData) {
         throw new Error("Invalid form data provided.");
     }
 
-    const { photoDataUri, anomalyType, title, description } = validatedFields.data;
+    const { photoDataUri, anomalyType, title, description, confidence } = validatedFields.data;
 
     let imageUrl;
     try {
@@ -50,7 +52,8 @@ export async function submitReport(formData: FormData) {
             imageHint,
             type: anomalyType,
             status: "Received",
-            reportedAt: new Date(),
+            reportedAt: serverTimestamp(),
+            confidence,
         });
     } catch (error) {
         console.error("Error saving report to Firestore:", error);
