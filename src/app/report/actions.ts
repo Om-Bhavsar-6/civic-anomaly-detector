@@ -33,7 +33,7 @@ export async function submitReport(formData: FormData) {
         imageUrl = await getDownloadURL(storageRef);
     } catch (error) {
         console.error("Error uploading image to Firebase Storage:", error);
-        throw new Error("Failed to upload image.");
+        throw new Error("Failed to upload image. Please check your Firebase Storage security rules in the Firebase Console.");
     }
 
     try {
@@ -52,6 +52,6 @@ export async function submitReport(formData: FormData) {
         });
     } catch (error) {
         console.error("Error saving report to Firestore:", error);
-        throw new Error("Failed to save report data.");
+        throw new Error("Failed to save report data. Please check your Firestore security rules in the Firebase Console.");
     }
 }
