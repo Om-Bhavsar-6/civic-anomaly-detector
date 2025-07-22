@@ -3,8 +3,11 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+ HEAD
 import { Loader2, CheckCircle, XCircle, Upload, Phone, Mail, Link as LinkIcon, Twitter } from 'lucide-react';
 import Link from 'next/link';
+import { Loader2, CheckCircle, XCircle, Upload } from 'lucide-react';
+1b77dbb (Remove the firebase console from the project and make the project work t)
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +16,9 @@ import { useToast } from '@/hooks/use-toast';
 import { detectAnomaly, DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
+ HEAD
 import { Separator } from '@/components/ui/separator';
+ 1b77dbb (Remove the firebase console from the project and make the project work t)
 
 export function ReportForm() {
   const { toast } = useToast();
