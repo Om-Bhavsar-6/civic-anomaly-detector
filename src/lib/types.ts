@@ -1,0 +1,17 @@
+export type AnomalyType = 'Pothole' | 'Broken Streetlight' | 'Graffiti' | 'Other';
+export type ReportStatus = 'Received' | 'In Progress' | 'Resolved';
+
+export interface Report {
+  id: string;
+  title: string;
+  type: AnomalyType;
+  description: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  imageUrl: string;
+  imageHint: string;
+  status: ReportStatus;
+  reportedAt: string;
+}
