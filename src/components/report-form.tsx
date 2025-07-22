@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from 'react';
@@ -14,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { runAnalysis } from '@/app/report/actions';
+import { runAnalysis, submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
@@ -70,21 +71,35 @@ export function ReportForm() {
   };
   
   const onSubmit: SubmitHandler<ReportFormValues> = async (data) => {
+    if (!imagePreview) {
+        toast({ variant: 'destructive', title: "Image Required", description: "Please upload an image before submitting." });
+        return;
+    }
     setIsSubmitting(true);
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast({
-      title: "Report Submitted!",
-      description: "Thank you for helping improve your community. You will be redirected shortly.",
-    });
 
-    // In a real app, you'd send all data (data, imagePreview) to a final submission action.
-    console.log({ ...data, image: undefined });
-    
-    setTimeout(() => {
-        router.push('/');
-    }, 2000);
+    try {
+        const formData = new FormData();
+        formData.append('title', data.title);
+        formData.append('description', data.description);
+        formData.append('photoDataUri', imagePreview);
+        
+        await submitReport(formData);
+
+        toast({
+            title: "Report Submitted!",
+            description: "Thank you for helping improve your community. You will be redirected shortly.",
+        });
+        
+        setTimeout(() => {
+            router.push('/');
+        }, 2000);
+
+    } catch (error) {
+        console.error("Submission failed", error);
+        toast({ variant: 'destructive', title: "Submission Failed", description: "Could not submit your report. Please try again." });
+    } finally {
+        setIsSubmitting(false);
+    }
   };
   
   return (
