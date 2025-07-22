@@ -8,14 +8,18 @@ import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { z } from "zod";
 
 const reportSchema = z.object({
-    photoDataUri: z.string().min(1, "Image data URI is required."),
+    photoDataUri: z.string().min(1, "Image is required."),
     anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
+    title: z.string().min(1, "Title is required."),
+    description: z.string().min(1, "Description is required."),
 });
 
 export async function submitReport(formData: FormData) {
     const rawFormData = {
         photoDataUri: formData.get('photoDataUri'),
         anomalyType: formData.get('anomalyType'),
+        title: formData.get('title'),
+        description: formData.get('description'),
     };
 
     const validatedFields = reportSchema.safeParse(rawFormData);
@@ -24,7 +28,7 @@ export async function submitReport(formData: FormData) {
         throw new Error("Invalid form data provided.");
     }
 
-    const { photoDataUri, anomalyType } = validatedFields.data;
+    const { photoDataUri, anomalyType, title, description } = validatedFields.data;
 
     let imageUrl;
     try {
@@ -37,8 +41,6 @@ export async function submitReport(formData: FormData) {
     }
 
     try {
-        const title = `${anomalyType} Report`;
-        const description = `A new ${anomalyType} has been reported.`;
         const imageHint = anomalyType.toLowerCase();
 
         await addDoc(collection(db, "reports"), {
