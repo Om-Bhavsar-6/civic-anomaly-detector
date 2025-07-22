@@ -1,6 +1,12 @@
 import type { Timestamp } from 'firebase/firestore';
 
-export type AnomalyType = 'Pothole' | 'Broken Streetlight' | 'Graffiti' | 'Other';
+export enum AnomalyType {
+  Pothole = 'Pothole',
+  BrokenStreetlight = 'Broken Streetlight',
+  Graffiti = 'Graffiti',
+  Other = 'Other',
+};
+
 export type ReportStatus = 'Received' | 'In Progress' | 'Resolved';
 
 export interface Report {
