@@ -7,7 +7,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import { Camera, Loader2, LightbulbOff, AlertTriangle, Wand2, CheckCircle, XCircle } from 'lucide-react';
+import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -18,14 +18,14 @@ import { useToast } from '@/hooks/use-toast';
 import { submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
-import type { AnomalyType } from '@/lib/types';
+import { AnomalyType } from '@/lib/types';
 import { detectAnomaly, type DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
 
 const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
-    { type: 'Pothole', icon: PotholeIcon, label: 'Pothole' },
-    { type: 'Broken Streetlight', icon: LightbulbOff, label: 'Streetlight' },
-    { type: 'Graffiti', icon: GraffitiIcon, label: 'Graffiti' },
-    { type: 'Other', icon: AlertTriangle, label: 'Other' },
+    { type: AnomalyType.Pothole, icon: PotholeIcon, label: 'Pothole' },
+    { type: AnomalyType.BrokenStreetlight, icon: LightbulbOff, label: 'Streetlight' },
+    { type: AnomalyType.Graffiti, icon: GraffitiIcon, label: 'Graffiti' },
+    { type: AnomalyType.Other, icon: AlertTriangle, label: 'Other' },
 ];
 
 const reportSchema = z.object({
