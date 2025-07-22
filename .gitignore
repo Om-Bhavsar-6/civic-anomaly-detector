@@ -1,45 +1,65 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+.pnp.js
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# vercel
+# Vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+#-*-*-*-*-*-*-*-*-*--
+# JetBrains specific
+# see https://www.jetbrains.com/help/idea/ignoring-files.html
+# -*-*-*-*-*-*-*-*-*--
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/contentModel.xml
+.idea/**/credentials.xml
+.idea/**/proxy.xml
+.idea/**/lifecycle.xml
+.idea/**/modules.xml
+.idea/**/vcs.xml
+.idea/**/gradle.xml
+.idea/**/libraries
+.idea/**/caches
+# Sensitive or heavyweight stuff
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
 
-.genkit/*
-.env*
+# Gradle
+.gradle
+/build/
 
-# firebase
-firebase-debug.log
-firestore-debug.log
+# Local History
+.history
+
+# Env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
