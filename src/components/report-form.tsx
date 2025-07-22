@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle, Upload } from 'lucide-react';
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,6 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { submitReport } from '@/app/report/actions';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AnomalyType } from '@/lib/types';
 import { detectAnomaly, DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -41,32 +40,16 @@ export function ReportForm() {
   const { toast } = useToast();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [analysisResult, setAnalysisResult] = useState<DetectAnomalyOutput | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
     defaultValues: { image: '', anomalyType: undefined },
   });
-  
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
-        setHasCameraPermission(true);
-        if (videoRef.current) videoRef.current.srcObject = stream;
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-      }
-    };
-    getCameraPermission();
-  }, []);
   
   const handleImageSelect = (dataUri: string) => {
     setImagePreview(dataUri);
@@ -79,19 +62,6 @@ export function ReportForm() {
       const reader = new FileReader();
       reader.onloadend = () => handleImageSelect(reader.result as string);
       reader.readAsDataURL(file);
-    }
-  };
-  
-  const handleCapture = () => {
-    if (videoRef.current) {
-        const canvas = document.createElement('canvas');
-        canvas.width = videoRef.current.videoWidth;
-        canvas.height = videoRef.current.videoHeight;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-            handleImageSelect(canvas.toDataURL('image/jpeg'));
-        }
     }
   };
 
@@ -149,7 +119,7 @@ export function ReportForm() {
             <CardContent className="space-y-6 pt-6">
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
-                <p className="text-sm text-muted-foreground">Take a picture or upload a photo.</p>
+                <p className="text-sm text-muted-foreground">Upload a photo of the anomaly.</p>
                 <FormField
                   control={form.control}
                   name="image"
@@ -159,32 +129,18 @@ export function ReportForm() {
                           <div className="space-y-4">
                               <div
                                   className="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted transition-colors"
-                                  onClick={() => !imagePreview && fileInputRef.current?.click()}
+                                  onClick={() => fileInputRef.current?.click()}
                               >
                                   {imagePreview ? (
                                       <Image src={imagePreview} alt="Anomaly preview" fill className="rounded-lg object-contain p-2" />
                                   ) : (
-                                    <>
-                                      <video ref={videoRef} className="w-full h-full object-cover rounded-md" autoPlay muted playsInline/>
-                                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white">
-                                          <Camera className="w-10 h-10 mb-3" />
-                                          <p className="mb-2 text-sm">Click to upload or use camera</p>
+                                      <div className="flex flex-col items-center justify-center text-muted-foreground">
+                                          <Upload className="w-10 h-10 mb-3" />
+                                          <p className="mb-2 text-sm">Click to upload an image</p>
+                                          <p className="text-xs">PNG, JPG, or JPEG</p>
                                       </div>
-                                    </>
                                   )}
-                                  <Input type="file" accept="image/*" capture="environment" className="hidden" ref={fileInputRef} onChange={handleImageChange} />
-                              </div>
-                              {hasCameraPermission === false && (
-                                  <Alert variant="destructive">
-                                      <AlertTitle>Camera Access Denied</AlertTitle>
-                                      <AlertDescription>Please allow camera access to take a photo. You can still upload a file manually.</AlertDescription>
-                                  </Alert>
-                              )}
-                              <div className="flex justify-center">
-                                  <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission}>
-                                      <Camera className="mr-2" />
-                                      Capture Photo
-                                  </Button>
+                                  <Input type="file" accept="image/png, image/jpeg, image/jpg" className="hidden" ref={fileInputRef} onChange={handleImageChange} />
                               </div>
                           </div>
                       </FormControl>
