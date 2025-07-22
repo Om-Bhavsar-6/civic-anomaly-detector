@@ -1,51 +1,34 @@
+
 import { ReportList } from '@/components/report-list';
 import type { Report } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Trophy, Zap, Users } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore';
+import { formatDistanceToNow } from 'date-fns';
 
-// Mock data for demonstration
-const mockReports: Report[] = [
-  {
-    id: '1',
-    title: 'Large Pothole on Main St',
-    type: 'Pothole',
-    description: 'A large and dangerous pothole has formed in the eastbound lane of Main Street, right before the intersection with Oak Ave.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'pothole road',
-    status: 'In Progress',
-    reportedAt: '2 days ago',
-  },
-  {
-    id: '2',
-    title: 'Streetlight out at City Park',
-    type: 'Broken Streetlight',
-    description: 'The streetlight at the main entrance of City Park is not working, making the area very dark and unsafe at night.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'dark park',
-    status: 'Received',
-    reportedAt: '5 hours ago',
-  },
-  {
-    id: '3',
-    title: 'Graffiti on library wall',
-    type: 'Graffiti',
-    description: 'Someone has spray-painted graffiti on the west-facing wall of the public library. It covers a large area.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'graffiti wall',
-    status: 'Resolved',
-    reportedAt: '1 week ago',
-  },
-  {
-    id: '4',
-    title: 'Overgrown bushes blocking sidewalk',
-    type: 'Other',
-    description: 'The bushes from a private residence are completely blocking the sidewalk on Elm Street, forcing pedestrians to walk in the road.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    imageHint: 'overgrown bushes',
-    status: 'Received',
-    reportedAt: '22 hours ago',
-  }
-];
+async function getReports(): Promise<Report[]> {
+  const reportsCol = collection(db, 'reports');
+  const reportsQuery = query(reportsCol, orderBy('reportedAt', 'desc'), limit(10));
+  const reportSnapshot = await getDocs(reportsQuery);
+  
+  const reports: Report[] = reportSnapshot.docs.map(doc => {
+    const data = doc.data();
+    const reportedAtDate = data.reportedAt.toDate();
+    return {
+      id: doc.id,
+      title: data.title,
+      description: data.description,
+      imageUrl: data.imageUrl,
+      imageHint: data.imageHint,
+      type: data.type,
+      status: data.status,
+      reportedAt: formatDistanceToNow(reportedAtDate) + ' ago',
+    } as Report;
+  });
+
+  return reports;
+}
 
 const achievements = [
     { icon: Trophy, value: '1,200+', label: 'Anomalies Resolved' },
@@ -53,7 +36,9 @@ const achievements = [
     { icon: Users, value: '5,000+', label: 'Community Reporters' },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const reports = await getReports();
+
   return (
     <div className="space-y-12">
       <div>
@@ -61,7 +46,7 @@ export default function Home() {
         <p className="text-muted-foreground">
           Browse recent anomalies reported by the community.
         </p>
-        <ReportList reports={mockReports} />
+        <ReportList reports={reports} />
       </div>
 
       <div>
@@ -84,3 +69,5 @@ export default function Home() {
     </div>
   );
 }
+
+export const revalidate = 60; // Re-fetch data every 60 seconds

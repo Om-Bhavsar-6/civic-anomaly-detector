@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export type AnomalyType = 'Pothole' | 'Broken Streetlight' | 'Graffiti' | 'Other';
 export type ReportStatus = 'Received' | 'In Progress' | 'Resolved';
 
@@ -9,5 +11,5 @@ export interface Report {
   imageUrl: string;
   imageHint: string;
   status: ReportStatus;
-  reportedAt: string;
+  reportedAt: Timestamp | Date | string; // Allow for Firestore Timestamp, client-side Date, and string formatting
 }
