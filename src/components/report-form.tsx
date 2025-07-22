@@ -7,22 +7,29 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import { Camera, Loader2, Wand2, CheckCircle, Info } from 'lucide-react';
+import { Camera, Loader2, Wand2, CheckCircle, Info, LightbulbOff, AlertTriangle } from 'lucide-react';
+import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { runAnalysis, submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
+import type { AnomalyType } from '@/lib/types';
+
+const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
+    { type: 'Pothole', icon: PotholeIcon, label: 'Pothole' },
+    { type: 'Broken Streetlight', icon: LightbulbOff, label: 'Streetlight' },
+    { type: 'Graffiti', icon: GraffitiIcon, label: 'Graffiti' },
+    { type: 'Other', icon: AlertTriangle, label: 'Other' },
+];
 
 const reportSchema = z.object({
-  title: z.string().min(5, { message: 'Title must be at least 5 characters long.' }),
-  description: z.string().min(10, { message: 'Description must be at least 10 characters long.' }),
   image: z.instanceof(FileList).refine(files => files?.length > 0, 'An image is required.'),
+  anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
 });
 
 type ReportFormValues = z.infer<typeof reportSchema>;
@@ -38,8 +45,7 @@ export function ReportForm() {
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
     defaultValues: {
-      title: '',
-      description: '',
+      anomalyType: '',
     },
   });
   
@@ -57,11 +63,8 @@ export function ReportForm() {
         try {
           const result = await runAnalysis(dataUri);
           setAnalysisResult(result.anomalies);
-          if (result.anomalies.length > 0 && !form.getValues('description')) {
-            form.setValue('description', result.anomalies.join(', '));
-          }
         } catch (error) {
-          toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image. Please describe the issue manually." });
+          toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image." });
         } finally {
           setIsAnalyzing(false);
         }
@@ -79,8 +82,7 @@ export function ReportForm() {
 
     try {
         const formData = new FormData();
-        formData.append('title', data.title);
-        formData.append('description', data.description);
+        formData.append('anomalyType', data.anomalyType);
         formData.append('photoDataUri', imagePreview);
         
         await submitReport(formData);
@@ -110,7 +112,7 @@ export function ReportForm() {
             <div className="space-y-2">
               <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
               <p className="text-sm text-muted-foreground">
-                Upload a photo. Our AI will try to identify the issue.
+                Upload a photo. Our AI will analyze the issue.
               </p>
               <FormField
                 control={form.control}
@@ -162,46 +164,40 @@ export function ReportForm() {
                   <Alert variant="default" className={cn(analysisResult.length > 0 ? "bg-blue-50 border-blue-200" : "bg-green-50 border-green-200")}>
                      {analysisResult.length > 0 ? <Info className="h-4 w-4 text-blue-600" /> : <CheckCircle className="h-4 w-4 text-green-600" />}
                     <AlertTitle className={cn(analysisResult.length > 0 ? "text-blue-800" : "text-green-800")}>
-                      {analysisResult.length > 0 ? "Anomalies Detected" : "Looking Good!"}
+                      {analysisResult.length > 0 ? "Potential Anomalies Detected" : "Looking Good!"}
                     </AlertTitle>
                     <AlertDescription className={cn(analysisResult.length > 0 ? "text-blue-700" : "text-green-700")}>
-                        {analysisResult.length > 0 ? `Detected: ${analysisResult.join(', ')}` : "We couldn't auto-detect an issue, the image looks normal. If you still see a problem, please describe it below."}
+                        {analysisResult.length > 0 ? `We detected: ${analysisResult.join(', ')}.` : "We couldn't auto-detect an issue, the image looks normal."} Please select an anomaly type below.
                     </AlertDescription>
                   </Alert>
                )}
             </div>
 
             <div className="space-y-2">
-                <h3 className="text-lg font-medium">2. Details</h3>
+                <h3 className="text-lg font-medium">2. Anomaly Type</h3>
                 <p className="text-sm text-muted-foreground">
-                    Provide a title and description for your report.
+                    Select the type of issue you are reporting.
                 </p>
                 <FormField
                 control={form.control}
-                name="title"
+                name="anomalyType"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Title</FormLabel>
                     <FormControl>
-                        <Input placeholder="e.g., Large pothole on Elm Street" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                        <Textarea
-                        placeholder="Provide more details about the issue, its size, and exact location."
-                        className="resize-y"
-                        rows={4}
-                        {...field}
-                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            {anomalyTypes.map(({type, icon: Icon, label}) => (
+                                <Button
+                                key={type}
+                                type="button"
+                                variant={field.value === type ? 'default' : 'outline'}
+                                className="h-20 text-base"
+                                onClick={() => field.onChange(type)}
+                                >
+                                <Icon className="mr-2 h-6 w-6" />
+                                {label}
+                                </Button>
+                            ))}
+                        </div>
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -210,7 +206,7 @@ export function ReportForm() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting || isAnalyzing} className="w-full">
+            <Button type="submit" disabled={isSubmitting || isAnalyzing || !imagePreview} className="w-full">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Submit Report
             </Button>
