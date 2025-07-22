@@ -48,7 +48,11 @@ export async function submitReport(formData: FormData) {
         imageUrl = await getDownloadURL(storageRef);
     } catch (error) {
         console.error("Error uploading image to Firebase Storage:", error);
+ HEAD
         throw new Error("Image upload failed. Please update your Storage Security Rules in the Firebase Console to allow unauthenticated writes. For testing, you can use: 'allow read, write: if true;'.");
+=======
+        throw new Error("Failed to upload image. Please check your Firebase Storage security rules in the Firebase Console.");
+ 24ef055 (I see this error with the app, reported by NextJS, please fix it. The er)
     }
 
     try {
