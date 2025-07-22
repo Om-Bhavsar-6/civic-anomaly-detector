@@ -1,8 +1,24 @@
 
 "use server";
 
+ HEAD
 // This file is no longer used as report submission to a database has been removed.
 // It is kept to prevent breaking imports, but the functions are not called.
+
+import { db, storage } from "@/lib/firebase";
+import { AnomalyType } from "@/lib/types";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { z } from "zod";
+
+const reportSchema = z.object({
+    photoDataUri: z.string().min(1, "Image is required."),
+    anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
+    title: z.string().min(1, "Title is required."),
+    description: z.string().min(1, "Description is required."),
+    confidence: z.coerce.number(),
+});
+ 17bf9d7 (also remove the details section. And when you click on submit report a P)
 
 export async function submitReport(formData: FormData) {
  HEAD
