@@ -8,8 +8,8 @@ import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { z } from "zod";
 
 const reportSchema = z.object({
-    photoDataUri: z.string(),
-    anomalyType: z.nativeEnum(AnomalyType),
+    photoDataUri: z.string().min(1, "Image data URI is required."),
+    anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
 });
 
 export async function submitReport(formData: FormData) {
@@ -20,22 +20,27 @@ export async function submitReport(formData: FormData) {
 
     const validatedFields = reportSchema.safeParse(rawFormData);
     if (!validatedFields.success) {
+        console.error("Form validation failed:", validatedFields.error.flatten().fieldErrors);
         throw new Error("Invalid form data provided.");
     }
 
     const { photoDataUri, anomalyType } = validatedFields.data;
 
+    let imageUrl;
+    try {
+        const storageRef = ref(storage, `anomalies/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`);
+        await uploadString(storageRef, photoDataUri, 'data_url');
+        imageUrl = await getDownloadURL(storageRef);
+    } catch (error) {
+        console.error("Error uploading image to Firebase Storage:", error);
+        throw new Error("Failed to upload image.");
+    }
+
     try {
         const title = `${anomalyType} Report`;
         const description = `A new ${anomalyType} has been reported.`;
-
-        // Upload image to Firebase Storage
-        const storageRef = ref(storage, `anomalies/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`);
-        const uploadResult = await uploadString(storageRef, photoDataUri, 'data_url');
-        const imageUrl = await getDownloadURL(uploadResult.ref);
         const imageHint = anomalyType.toLowerCase();
 
-        // Save report to Firestore
         await addDoc(collection(db, "reports"), {
             title,
             description,
@@ -46,7 +51,7 @@ export async function submitReport(formData: FormData) {
             reportedAt: new Date(),
         });
     } catch (error) {
-        console.error("Error submitting report:", error);
-        throw new Error("Failed to submit report.");
+        console.error("Error saving report to Firestore:", error);
+        throw new Error("Failed to save report data.");
     }
 }
