@@ -27,7 +27,7 @@ const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string 
 ];
 
 const reportSchema = z.object({
-  image: z.any().refine(value => value?.length > 0, 'An image is required.'),
+  image: z.any().refine(value => value, 'An image is required.'),
   anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
 });
 
@@ -108,7 +108,8 @@ export function ReportForm() {
 
     } catch (error) {
         console.error("Submission failed", error);
-        toast({ variant: 'destructive', title: "Submission Failed", description: "Could not submit your report. Please try again." });
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+        toast({ variant: 'destructive', title: "Submission Failed", description: `Could not submit your report: ${errorMessage}` });
     } finally {
         setIsSubmitting(false);
     }
@@ -232,7 +233,7 @@ export function ReportForm() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting || !imagePreview} className="w-full">
+            <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Submit Report
             </Button>
