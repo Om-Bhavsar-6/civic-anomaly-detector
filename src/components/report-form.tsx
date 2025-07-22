@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useState, useRef, useEffect, useTransition } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,6 @@ import { submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
 import { AnomalyType } from '@/lib/types';
-import { detectAnomaly, type DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
 
 const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
     { type: AnomalyType.Pothole, icon: PotholeIcon, label: 'Pothole' },
@@ -43,8 +42,6 @@ export function ReportForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const [isAnalyzing, startAnalyzing] = useTransition();
-  const [analysisResult, setAnalysisResult] = useState<DetectAnomalyOutput | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,19 +77,6 @@ export function ReportForm() {
   const handleImageSelect = (dataUri: string) => {
     setImagePreview(dataUri);
     form.setValue('image', dataUri, { shouldValidate: true });
-    setAnalysisResult(null);
-
-    startAnalyzing(async () => {
-      try {
-        const result = await detectAnomaly({ photoDataUri: dataUri });
-        setAnalysisResult(result);
-        form.setValue('title', result.title);
-        form.setValue('description', result.description);
-      } catch (error) {
-        console.error('Analysis failed:', error);
-        toast({ variant: 'destructive', title: "Analysis Failed", description: "Could not analyze the image." });
-      }
-    });
   }
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,11 +105,6 @@ export function ReportForm() {
   };
 
   const onSubmit: SubmitHandler<ReportFormValues> = async (data) => {
-    if (!analysisResult?.isAnomaly) {
-      toast({ variant: 'destructive', title: "Cannot Report", description: "No anomaly was detected in the image." });
-      return;
-    }
-    
     setIsSubmitting(true);
 
     try {
@@ -205,7 +184,7 @@ export function ReportForm() {
                                   </Alert>
                             )}
                             <div className="flex justify-center">
-                                <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission || isAnalyzing}>
+                                <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission}>
                                     <Camera className="mr-2" />
                                     Capture Photo
                                 </Button>
@@ -217,52 +196,6 @@ export function ReportForm() {
                 )}
               />
             </div>
-
-            { (isAnalyzing || analysisResult) && (
-              <div className="space-y-4 rounded-lg border bg-card p-4">
-                 <div className="flex items-center gap-3">
-                    {isAnalyzing && <Loader2 className="w-6 h-6 animate-spin text-primary" />}
-                    {!isAnalyzing && analysisResult?.isAnomaly && <CheckCircle className="w-6 h-6 text-green-500" />}
-                    {!isAnalyzing && !analysisResult?.isAnomaly && <XCircle className="w-6 h-6 text-destructive" />}
-                    <h3 className="text-lg font-medium">AI Analysis</h3>
-                </div>
-
-                {isAnalyzing && (
-                  <p className="text-sm text-muted-foreground">Analyzing image for anomalies...</p>
-                )}
-                
-                {analysisResult && (
-                  <div className='space-y-4'>
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Title</FormLabel>
-                          <FormControl>
-                            <Input {...field} readOnly={!isAnalyzing} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Textarea {...field} readOnly={!isAnalyzing} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
 
             <div className="space-y-2">
                 <h3 className="text-lg font-medium">2. Anomaly Type</h3>
@@ -295,11 +228,46 @@ export function ReportForm() {
                 )}
                 />
             </div>
+            
+            <div className="space-y-4 rounded-lg border bg-card p-4">
+                 <div className="flex items-center gap-3">
+                    <h3 className="text-lg font-medium">3. Details</h3>
+                </div>
+                <div className='space-y-4'>
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="e.g., Large pothole on Main St" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} placeholder="Describe the issue in more detail." />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </div>
+              </div>
+
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting || isAnalyzing || !form.formState.isValid || !analysisResult?.isAnomaly} className="w-full">
+            <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              { isAnalyzing ? 'Analyzing...' : 'Submit Report'}
+              Submit Report
             </Button>
           </CardFooter>
         </form>
