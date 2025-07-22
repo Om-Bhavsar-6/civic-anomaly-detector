@@ -24,6 +24,8 @@ const DetectAnomalyOutputSchema = z.object({
     title: z.string().describe('A concise, descriptive title for the anomaly report (e.g., "Pothole on Main Street", "Graffiti on Park Bench"). If no anomaly is detected, this should be "No Anomaly Detected".'),
     description: z.string().describe("A brief, one-sentence description of the issue. If no anomaly is detected, this should state that the image appears normal."),
     confidence: z.number().describe("A percentage value (0-100) indicating the confidence of the anomaly detection. If no anomaly is detected, this should be 0."),
+    solution: z.string().describe("A brief, one-sentence suggested solution for the detected anomaly. If no anomaly is detected, this should be an empty string."),
+    fixTip: z.string().describe("A brief, one-sentence practical tip for fixing the issue. If no anomaly is detected, this should be an empty string."),
 });
 export type DetectAnomalyOutput = z.infer<typeof DetectAnomalyOutputSchema>;
 
@@ -39,8 +41,8 @@ const prompt = ai.definePrompt({
 
 Analyze the image provided and determine if it shows a clear civic issue like a pothole, broken streetlight, graffiti, or other public infrastructure problems.
 
-- If an anomaly is found, set isAnomaly to true and generate a suitable title and a one-sentence description for the report. Provide a confidence score as a percentage.
-- If the image appears to be a normal scene without any obvious anomalies, set isAnomaly to false, set the title to "No Anomaly Detected", provide a description explaining that no issue was found, and set the confidence to 0.
+- If an anomaly is found, set isAnomaly to true and generate a suitable title, a one-sentence description, a confidence score as a percentage, a suggested solution, and a practical fix-it tip.
+- If the image appears to be a normal scene without any obvious anomalies, set isAnomaly to false, set the title to "No Anomaly Detected", provide a description explaining that no issue was found, set the confidence to 0, and leave the solution and fixTip fields empty.
 
 Photo: {{media url=photoDataUri}}`,
 });
