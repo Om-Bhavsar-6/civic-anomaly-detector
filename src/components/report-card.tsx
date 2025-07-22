@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, LightbulbOff, AlertTriangle, Clock } from 'lucide-react';
+import { LightbulbOff, AlertTriangle, Clock } from 'lucide-react';
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 import type { Report, AnomalyType, ReportStatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -54,11 +54,7 @@ export function ReportCard({ report }: ReportCardProps) {
         </div>
         <p className="text-sm text-muted-foreground">{report.description}</p>
       </CardContent>
-      <CardFooter className="flex justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          <span>Location Reported</span>
-        </div>
+      <CardFooter className="flex justify-end text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4" />
           <span>{report.reportedAt}</span>
