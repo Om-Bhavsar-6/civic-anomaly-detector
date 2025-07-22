@@ -7,7 +7,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
-import { Camera, Loader2, Wand2, CheckCircle, Info, LightbulbOff, AlertTriangle } from 'lucide-react';
+import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -15,9 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { runAnalysis, submitReport } from '@/app/report/actions';
+import { submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
 import type { AnomalyType } from '@/lib/types';
 
 const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
@@ -38,8 +37,6 @@ export function ReportForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<string[] | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -80,16 +77,7 @@ export function ReportForm() {
       reader.onloadend = async () => {
         const dataUri = reader.result as string;
         setImagePreview(dataUri);
-        setAnalysisResult(null);
-        setIsAnalyzing(true);
-        try {
-          const result = await runAnalysis(dataUri);
-          setAnalysisResult(result.anomalies);
-        } catch (error) {
-          toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image." });
-        } finally {
-          setIsAnalyzing(false);
-        }
+        form.setValue('image', dataUri, { shouldValidate: true });
       };
       reader.readAsDataURL(file);
     }
@@ -130,19 +118,12 @@ export function ReportForm() {
     if (videoRef.current) {
         const canvas = document.createElement('canvas');
         canvas.width = videoRef.current.videoWidth;
-        canvas.height = video.current.videoHeight;
+        canvas.height = videoRef.current.videoHeight;
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
             const dataUri = canvas.toDataURL('image/jpeg');
             setImagePreview(dataUri);
-
-            // Trigger analysis
-            setIsAnalyzing(true);
-            runAnalysis(dataUri)
-                .then(result => setAnalysisResult(result.anomalies))
-                .catch(() => toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image." }))
-                .finally(() => setIsAnalyzing(false));
             
             // Set value for form validation
             form.setValue('image', dataUri, { shouldValidate: true });
@@ -159,7 +140,7 @@ export function ReportForm() {
             <div className="space-y-2">
               <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
               <p className="text-sm text-muted-foreground">
-                Upload a photo, or use your camera. Our AI will analyze the issue.
+                Upload a photo, or use your camera.
               </p>
               <FormField
                 control={form.control}
@@ -192,7 +173,6 @@ export function ReportForm() {
                                     onBlur={field.onBlur}
                                     name={field.name}
                                     onChange={(e) => {
-                                      field.onChange(e.target.files);
                                       handleImageChange(e);
                                     }}
                                 />
@@ -217,26 +197,6 @@ export function ReportForm() {
                   </FormItem>
                 )}
               />
-               {isAnalyzing && (
-                  <Alert>
-                    <Wand2 className="h-4 w-4 animate-pulse" />
-                    <AlertTitle>AI Analysis in Progress</AlertTitle>
-                    <AlertDescription>
-                      Please wait while we analyze your photo...
-                    </AlertDescription>
-                  </Alert>
-               )}
-               {analysisResult && (
-                  <Alert variant="default" className={cn(analysisResult.length > 0 ? "bg-blue-50 border-blue-200" : "bg-green-50 border-green-200")}>
-                     {analysisResult.length > 0 ? <Info className="h-4 w-4 text-blue-600" /> : <CheckCircle className="h-4 w-4 text-green-600" />}
-                    <AlertTitle className={cn(analysisResult.length > 0 ? "text-blue-800" : "text-green-800")}>
-                      {analysisResult.length > 0 ? "Potential Anomalies Detected" : "Looking Good!"}
-                    </AlertTitle>
-                    <AlertDescription className={cn(analysisResult.length > 0 ? "text-blue-700" : "text-green-700")}>
-                        {analysisResult.length > 0 ? `We detected: ${analysisResult.join(', ')}.` : "We couldn't auto-detect an issue, the image looks normal."} Please select an anomaly type below.
-                    </AlertDescription>
-                  </Alert>
-               )}
             </div>
 
             <div className="space-y-2">
@@ -272,7 +232,7 @@ export function ReportForm() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting || isAnalyzing || !imagePreview} className="w-full">
+            <Button type="submit" disabled={isSubmitting || !imagePreview} className="w-full">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Submit Report
             </Button>
@@ -282,5 +242,3 @@ export function ReportForm() {
     </Card>
   );
 }
-
-    
