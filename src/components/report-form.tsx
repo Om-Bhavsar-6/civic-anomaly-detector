@@ -66,8 +66,13 @@ const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string 
 ];
 
 const reportSchema = z.object({
+<<<<<<< HEAD
   image: z.string().min(1, 'An image is required.'),
   anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: 'Please select an anomaly type.'})}),
+=======
+  image: z.any().refine(value => value, 'An image is required.'),
+  anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
+>>>>>>> 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
 });
 
 type ReportFormValues = z.infer<typeof reportSchema>;
@@ -192,6 +197,34 @@ export function ReportForm() {
             <DialogTitle>Analyzing Image</DialogTitle>
             <DialogDescription>Please wait while we process the image.</DialogDescription>
 
+<<<<<<< HEAD
+=======
+    try {
+        const formData = new FormData();
+        formData.append('anomalyType', data.anomalyType);
+        formData.append('photoDataUri', imagePreview);
+        
+        await submitReport(formData);
+
+        toast({
+            title: "Report Submitted!",
+            description: "Thank you for helping improve your community. You will be redirected shortly.",
+        });
+        
+        setTimeout(() => {
+            router.push('/');
+        }, 2000);
+
+    } catch (error) {
+        console.error("Submission failed", error);
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+        toast({ variant: 'destructive', title: "Submission Failed", description: `Could not submit your report: ${errorMessage}` });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+  
+>>>>>>> 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
   const handleCapture = () => {
     if (videoRef.current) {
         const canvas = document.createElement('canvas');

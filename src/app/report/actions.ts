@@ -12,11 +12,16 @@ import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { z } from "zod";
 
 const reportSchema = z.object({
+ HEAD
     photoDataUri: z.string().min(1, "Image is required."),
     anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
     title: z.string().min(1, "Title is required."),
     description: z.string().min(1, "Description is required."),
     confidence: z.coerce.number(),
+
+    photoDataUri: z.string().min(1, "Image data URI is required."),
+    anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
+ 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
 });
  17bf9d7 (also remove the details section. And when you click on submit report a P)
 
@@ -50,12 +55,27 @@ export async function submitReport(formData: FormData) {
         console.error("Error uploading image to Firebase Storage:", error);
  HEAD
         throw new Error("Image upload failed. Please update your Storage Security Rules in the Firebase Console to allow unauthenticated writes. For testing, you can use: 'allow read, write: if true;'.");
-=======
+
         throw new Error("Failed to upload image. Please check your Firebase Storage security rules in the Firebase Console.");
  24ef055 (I see this error with the app, reported by NextJS, please fix it. The er)
     }
 
+    let imageUrl;
     try {
+        const storageRef = ref(storage, `anomalies/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`);
+        await uploadString(storageRef, photoDataUri, 'data_url');
+        imageUrl = await getDownloadURL(storageRef);
+    } catch (error) {
+        console.error("Error uploading image to Firebase Storage:", error);
+        throw new Error("Failed to upload image.");
+    }
+
+    try {
+ HEAD
+
+        const title = `${anomalyType} Report`;
+        const description = `A new ${anomalyType} has been reported.`;
+ 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
         const imageHint = anomalyType.toLowerCase();
 
         await addDoc(collection(db, "reports"), {
@@ -69,8 +89,11 @@ export async function submitReport(formData: FormData) {
             confidence,
         });
     } catch (error) {
-        console.error("Error saving report to Firestore:", error);
+        console.error("Error saving report to Firestore:", error); HEAD
         throw new Error("Failed to save report data. Please check your Firestore security rules in the Firebase Console.");
+
+        throw new Error("Failed to save report data.");
+ 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
     }
  aaa47bc (I see this error with the app, reported by NextJS, please fix it. The er)
 }
