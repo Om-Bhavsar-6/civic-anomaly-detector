@@ -1,6 +1,7 @@
 
 "use client";
 
+<<<<<<< HEAD
  HEAD
 import { useState, useRef } from 'react';
 import Image from 'next/image';
@@ -24,6 +25,8 @@ import { Separator } from '@/components/ui/separator';
 
 import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
+=======
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -75,10 +78,14 @@ const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string 
 
 const reportSchema = z.object({
 <<<<<<< HEAD
+<<<<<<< HEAD
   image: z.string().min(1, 'An image is required.'),
   anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: 'Please select an anomaly type.'})}),
 =======
   image: z.any().refine(value => value, 'An image is required.'),
+=======
+  image: z.any().refine(value => value?.length > 0, 'An image is required.'),
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
   anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
 >>>>>>> 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
 });
@@ -96,6 +103,7 @@ export function ReportForm() {
 >>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+<<<<<<< HEAD
  HEAD
  17bf9d7 (also remove the details section. And when you click on submit report a P)
   const [analysisResult, setAnalysisResult] = useState<DetectAnomalyOutput | null>(null);
@@ -104,6 +112,37 @@ export function ReportForm() {
 
  eeb2f48 (remove the AI analysis component)
 
+=======
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+      }
+    };
+
+    getCameraPermission();
+  }, []);
+
+
+  const form = useForm<ReportFormValues>({
+    resolver: zodResolver(reportSchema),
+    defaultValues: {
+      anomalyType: '',
+      image: null,
+    },
+  });
+  
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
   const fileInputRef = useRef<HTMLInputElement>(null);
  HEAD
   
@@ -239,11 +278,15 @@ export function ReportForm() {
     }
   };
   
+<<<<<<< HEAD
 >>>>>>> 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
+=======
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
   const handleCapture = () => {
     if (videoRef.current) {
         const canvas = document.createElement('canvas');
         canvas.width = videoRef.current.videoWidth;
+<<<<<<< HEAD
         canvas.height = videoRef.current.videoHeight;
         const ctx = canvas.getContext('2d');
         if (ctx) {
@@ -257,10 +300,29 @@ export function ReportForm() {
             // Set value for form validation
             form.setValue('image', dataUri, { shouldValidate: true });
 >>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
+=======
+        canvas.height = video.current.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+            const dataUri = canvas.toDataURL('image/jpeg');
+            setImagePreview(dataUri);
+
+            // Trigger analysis
+            setIsAnalyzing(true);
+            runAnalysis(dataUri)
+                .then(result => setAnalysisResult(result.anomalies))
+                .catch(() => toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image." }))
+                .finally(() => setIsAnalyzing(false));
+            
+            // Set value for form validation
+            form.setValue('image', dataUri, { shouldValidate: true });
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
         }
     }
   };
 
+<<<<<<< HEAD
  HEAD
   const handleAnalysisAndSubmit: SubmitHandler<ReportFormValues> = async (data) => {
     setIsAnalyzing(true);
@@ -311,6 +373,9 @@ export function ReportForm() {
     }
   };
   
+=======
+
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
   return (
  HEAD
     <>
@@ -330,10 +395,14 @@ export function ReportForm() {
               <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
               <p className="text-sm text-muted-foreground">
 <<<<<<< HEAD
+<<<<<<< HEAD
                 Take a picture or upload a photo of the anomaly.
 =======
                 Upload a photo, or use your camera.
 >>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
+=======
+                Upload a photo, or use your camera. Our AI will analyze the issue.
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
               </p>
                <FormField
                 control={form.control}
@@ -353,7 +422,11 @@ export function ReportForm() {
                                     <video ref={videoRef} className="w-full h-full object-cover rounded-md" autoPlay muted playsInline/>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white">
                                         <Camera className="w-10 h-10 mb-3" />
+<<<<<<< HEAD
                                         <p className="mb-2 text-sm">Click to upload or use camera</p>
+=======
+                                        <p className="mb-2 text-sm">Click to upload a photo</p>
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
                                     </div>
                                   </>
                                 )}
@@ -364,6 +437,7 @@ export function ReportForm() {
                                     className="hidden"
                                     ref={fileInputRef}
 <<<<<<< HEAD
+<<<<<<< HEAD
                                     onChange={handleImageChange}
 =======
                                     onBlur={field.onBlur}
@@ -372,13 +446,27 @@ export function ReportForm() {
                                       handleImageChange(e);
                                     }}
 >>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
+=======
+                                    onBlur={field.onBlur}
+                                    name={field.name}
+                                    onChange={(e) => {
+                                      field.onChange(e.target.files);
+                                      handleImageChange(e);
+                                    }}
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
                                 />
                             </div>
                             { hasCameraPermission === false && (
                                 <Alert variant="destructive">
+<<<<<<< HEAD
                                           <AlertTitle>Camera Access Denied</AlertTitle>
                                           <AlertDescription>
                                             Please allow camera access to take a photo. You can still upload a file manually.
+=======
+                                          <AlertTitle>Camera Access Required</AlertTitle>
+                                          <AlertDescription>
+                                            Please allow camera access to use this feature. You can still upload a photo manually.
+>>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
                                           </AlertDescription>
                                   </Alert>
                             )}
@@ -622,3 +710,5 @@ export function ReportForm() {
     </>
   );
 }
+
+    
