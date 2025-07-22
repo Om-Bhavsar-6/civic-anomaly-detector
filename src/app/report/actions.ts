@@ -1,10 +1,13 @@
 
 "use server";
 
+<<<<<<< HEAD
  HEAD
 // This file is no longer used as report submission to a database has been removed.
 // It is kept to prevent breaking imports, but the functions are not called.
 
+=======
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
 import { db, storage } from "@/lib/firebase";
 import { AnomalyType } from "@/lib/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -72,6 +75,11 @@ export async function submitReport(formData: FormData) {
 
     try {
  HEAD
+ HEAD
+
+        const title = `${anomalyType} Report`;
+        const description = `A new ${anomalyType} has been reported.`;
+ 2df0985 (Remove AI analysis of the images And why is the image submission failing)
 
         const title = `${anomalyType} Report`;
         const description = `A new ${anomalyType} has been reported.`;

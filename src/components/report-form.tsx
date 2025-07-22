@@ -30,12 +30,16 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
+<<<<<<< HEAD
  HEAD
 import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
  eeb2f48 (remove the AI analysis component)
 
 import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
  47aefef (I see this error with the app, reported by NextJS, please fix it. The er)
+=======
+import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -45,6 +49,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+<<<<<<< HEAD
  HEAD
 import { AnomalyType } from '@/lib/types';
  HEAD
@@ -57,6 +62,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { AnomalyType } from '@/lib/types';
 import { detectAnomaly, type DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
  47aefef (I see this error with the app, reported by NextJS, please fix it. The er)
+=======
+import type { AnomalyType } from '@/lib/types';
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
 
 const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
     { type: AnomalyType.Pothole, icon: PotholeIcon, label: 'Pothole' },
@@ -81,8 +89,11 @@ type ReportFormValues = z.infer<typeof reportSchema>;
 export function ReportForm() {
   const { toast } = useToast();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+<<<<<<< HEAD
  HEAD
 
+=======
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
  HEAD
@@ -103,6 +114,7 @@ export function ReportForm() {
       reader.onloadend = async () => {
         const dataUri = reader.result as string;
         setImagePreview(dataUri);
+<<<<<<< HEAD
         setIsAnalyzing(true);
         setIsDialogOpen(true);
         setAnalysisResult(null);
@@ -116,6 +128,9 @@ export function ReportForm() {
         } finally {
           setIsAnalyzing(false);
         }
+=======
+        form.setValue('image', dataUri, { shouldValidate: true });
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
       };
 
 
@@ -233,7 +248,15 @@ export function ReportForm() {
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+<<<<<<< HEAD
             handleImageSelect(canvas.toDataURL('image/jpeg'));
+=======
+            const dataUri = canvas.toDataURL('image/jpeg');
+            setImagePreview(dataUri);
+            
+            // Set value for form validation
+            form.setValue('image', dataUri, { shouldValidate: true });
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
         }
     }
   };
@@ -306,7 +329,11 @@ export function ReportForm() {
             <div className="space-y-2">
               <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
               <p className="text-sm text-muted-foreground">
+<<<<<<< HEAD
                 Take a picture or upload a photo of the anomaly.
+=======
+                Upload a photo, or use your camera.
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
               </p>
                <FormField
                 control={form.control}
@@ -336,7 +363,15 @@ export function ReportForm() {
                                     capture="environment"
                                     className="hidden"
                                     ref={fileInputRef}
+<<<<<<< HEAD
                                     onChange={handleImageChange}
+=======
+                                    onBlur={field.onBlur}
+                                    name={field.name}
+                                    onChange={(e) => {
+                                      handleImageChange(e);
+                                    }}
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
                                 />
                             </div>
                             { hasCameraPermission === false && (
@@ -571,7 +606,11 @@ export function ReportForm() {
 
           </CardContent>
           <CardFooter>
+<<<<<<< HEAD
             <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full">
+=======
+            <Button type="submit" disabled={isSubmitting || !imagePreview} className="w-full">
+>>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Submit Report
  eeb2f48 (remove the AI analysis component)
