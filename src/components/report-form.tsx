@@ -30,8 +30,12 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
+ HEAD
 import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
  eeb2f48 (remove the AI analysis component)
+
+import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+ 47aefef (I see this error with the app, reported by NextJS, please fix it. The er)
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -41,12 +45,18 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+ HEAD
 import { AnomalyType } from '@/lib/types';
  HEAD
 import { detectAnomaly, DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
  eeb2f48 (remove the AI analysis component)
+
+import { Textarea } from '@/components/ui/textarea';
+import { AnomalyType } from '@/lib/types';
+import { detectAnomaly, type DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
+ 47aefef (I see this error with the app, reported by NextJS, please fix it. The er)
 
 const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
     { type: AnomalyType.Pothole, icon: PotholeIcon, label: 'Pothole' },
