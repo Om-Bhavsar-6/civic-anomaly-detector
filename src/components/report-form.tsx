@@ -34,6 +34,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Image from 'next/image';
 <<<<<<< HEAD
+<<<<<<< HEAD
  HEAD
 import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
  eeb2f48 (remove the AI analysis component)
@@ -43,6 +44,9 @@ import { Camera, Loader2, LightbulbOff, AlertTriangle, CheckCircle, XCircle } fr
 =======
 import { Camera, Loader2, LightbulbOff, AlertTriangle } from 'lucide-react';
 >>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
+=======
+import { Camera, Loader2, Wand2, CheckCircle, Info, LightbulbOff, AlertTriangle } from 'lucide-react';
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
 import { PotholeIcon, GraffitiIcon } from '@/components/icons';
 
 import { Button } from '@/components/ui/button';
@@ -52,6 +56,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { submitReport } from '@/app/report/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+<<<<<<< HEAD
 <<<<<<< HEAD
  HEAD
 import { AnomalyType } from '@/lib/types';
@@ -88,6 +93,21 @@ const reportSchema = z.object({
 >>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
   anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
 >>>>>>> 62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
+=======
+import { cn } from '@/lib/utils';
+import type { AnomalyType } from '@/lib/types';
+
+const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string }[] = [
+    { type: 'Pothole', icon: PotholeIcon, label: 'Pothole' },
+    { type: 'Broken Streetlight', icon: LightbulbOff, label: 'Streetlight' },
+    { type: 'Graffiti', icon: GraffitiIcon, label: 'Graffiti' },
+    { type: 'Other', icon: AlertTriangle, label: 'Other' },
+];
+
+const reportSchema = z.object({
+  image: z.instanceof(FileList).refine(files => files?.length > 0, 'An image is required.'),
+  anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
 });
 
 type ReportFormValues = z.infer<typeof reportSchema>;
@@ -138,7 +158,10 @@ export function ReportForm() {
     resolver: zodResolver(reportSchema),
     defaultValues: {
       anomalyType: '',
+<<<<<<< HEAD
       image: null,
+=======
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
     },
   });
   
@@ -158,12 +181,19 @@ export function ReportForm() {
         setIsDialogOpen(true);
         setAnalysisResult(null);
         try {
+<<<<<<< HEAD
           const result = await detectAnomaly({ photoDataUri: dataUri });
           setAnalysisResult(result);
         } catch (error) {
           console.error("Analysis failed", error);
           toast({ variant: 'destructive', title: "Analysis Failed", description: "Could not analyze the image." });
           setIsDialogOpen(false);
+=======
+          const result = await runAnalysis(dataUri);
+          setAnalysisResult(result.anomalies);
+        } catch (error) {
+          toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image." });
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
         } finally {
           setIsAnalyzing(false);
         }
@@ -396,6 +426,7 @@ export function ReportForm() {
               <p className="text-sm text-muted-foreground">
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 Take a picture or upload a photo of the anomaly.
 =======
                 Upload a photo, or use your camera.
@@ -403,6 +434,9 @@ export function ReportForm() {
 =======
                 Upload a photo, or use your camera. Our AI will analyze the issue.
 >>>>>>> c6ade6b (I see this error with the app, reported by NextJS, please fix it. The er)
+=======
+                Upload a photo. Our AI will analyze the issue.
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
               </p>
                <FormField
                 control={form.control}
@@ -482,6 +516,29 @@ export function ReportForm() {
                   </FormItem>
                 )}
               />
+<<<<<<< HEAD
+=======
+               {isAnalyzing && (
+                  <Alert>
+                    <Wand2 className="h-4 w-4 animate-pulse" />
+                    <AlertTitle>AI Analysis in Progress</AlertTitle>
+                    <AlertDescription>
+                      Please wait while we analyze your photo...
+                    </AlertDescription>
+                  </Alert>
+               )}
+               {analysisResult && (
+                  <Alert variant="default" className={cn(analysisResult.length > 0 ? "bg-blue-50 border-blue-200" : "bg-green-50 border-green-200")}>
+                     {analysisResult.length > 0 ? <Info className="h-4 w-4 text-blue-600" /> : <CheckCircle className="h-4 w-4 text-green-600" />}
+                    <AlertTitle className={cn(analysisResult.length > 0 ? "text-blue-800" : "text-green-800")}>
+                      {analysisResult.length > 0 ? "Potential Anomalies Detected" : "Looking Good!"}
+                    </AlertTitle>
+                    <AlertDescription className={cn(analysisResult.length > 0 ? "text-blue-700" : "text-green-700")}>
+                        {analysisResult.length > 0 ? `We detected: ${analysisResult.join(', ')}.` : "We couldn't auto-detect an issue, the image looks normal."} Please select an anomaly type below.
+                    </AlertDescription>
+                  </Alert>
+               )}
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
             </div>
 
             <div className="space-y-2">
@@ -491,6 +548,7 @@ export function ReportForm() {
                 </p>
  eeb2f48 (remove the AI analysis component)
                 <FormField
+<<<<<<< HEAD
                   control={form.control}
                   name="image"
                   render={() => (
@@ -531,6 +589,31 @@ export function ReportForm() {
                       <FormMessage />
                     </FormItem>
                   )}
+=======
+                control={form.control}
+                name="anomalyType"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormControl>
+                        <div className="grid grid-cols-2 gap-4">
+                            {anomalyTypes.map(({type, icon: Icon, label}) => (
+                                <Button
+                                key={type}
+                                type="button"
+                                variant={field.value === type ? 'default' : 'outline'}
+                                className="h-20 text-base"
+                                onClick={() => field.onChange(type)}
+                                >
+                                <Icon className="mr-2 h-6 w-6" />
+                                {label}
+                                </Button>
+                            ))}
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
                 />
               </div>
 
@@ -695,10 +778,14 @@ export function ReportForm() {
           </CardContent>
           <CardFooter>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full">
 =======
             <Button type="submit" disabled={isSubmitting || !imagePreview} className="w-full">
 >>>>>>> 2df0985 (Remove AI analysis of the images And why is the image submission failing)
+=======
+            <Button type="submit" disabled={isSubmitting || isAnalyzing || !imagePreview} className="w-full">
+>>>>>>> 4f36eae (remove the 2.details section and keep the first section also make it wor)
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Submit Report
  eeb2f48 (remove the AI analysis component)

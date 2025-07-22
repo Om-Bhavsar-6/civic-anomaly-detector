@@ -10,11 +10,16 @@
  2df0985 (Remove AI analysis of the images And why is the image submission failing)
 import { db, storage } from "@/lib/firebase";
 import { AnomalyType } from "@/lib/types";
+ HEAD
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+
+import { addDoc, collection } from "firebase/firestore";
+ 4f36eae (remove the 2.details section and keep the first section also make it wor)
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { z } from "zod";
 
 const reportSchema = z.object({
+ HEAD
  HEAD
     photoDataUri: z.string().min(1, "Image is required."),
     anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
@@ -25,6 +30,10 @@ const reportSchema = z.object({
     photoDataUri: z.string().min(1, "Image data URI is required."),
     anomalyType: z.nativeEnum(AnomalyType, { errorMap: () => ({ message: "Invalid anomaly type." }) }),
  62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
+
+    photoDataUri: z.string(),
+    anomalyType: z.nativeEnum(AnomalyType),
+ 4f36eae (remove the 2.details section and keep the first section also make it wor)
 });
  17bf9d7 (also remove the details section. And when you click on submit report a P)
 
@@ -36,9 +45,12 @@ export async function submitReport(formData: FormData) {
     const rawFormData = {
         photoDataUri: formData.get('photoDataUri'),
         anomalyType: formData.get('anomalyType'),
+         HEAD
         title: formData.get('title'),
         description: formData.get('description'),
         confidence: formData.get('confidence'),
+
+ 4f36eae (remove the 2.details section and keep the first section also make it wor)
     };
 
     const validatedFields = reportSchema.safeParse(rawFormData);
@@ -47,6 +59,7 @@ export async function submitReport(formData: FormData) {
         throw new Error("Invalid form data provided.");
     }
 
+ HEAD
     const { photoDataUri, anomalyType, title, description, confidence } = validatedFields.data;
 
     let imageUrl;
@@ -84,6 +97,20 @@ export async function submitReport(formData: FormData) {
         const title = `${anomalyType} Report`;
         const description = `A new ${anomalyType} has been reported.`;
  62d7698 (I see this error with the app, reported by NextJS, please fix it. The er)
+
+    const { photoDataUri, anomalyType } = validatedFields.data;
+
+    try {
+        // Generate title and description from AI analysis
+        const analysisResult = await detectAnomalyFromImage({ photoDataUri });
+        const title = `${anomalyType} Report`;
+        const description = analysisResult.anomalies.length > 0 ? analysisResult.anomalies.join(', ') : `A new ${anomalyType} has been reported.`;
+
+        // Upload image to Firebase Storage
+        const storageRef = ref(storage, `anomalies/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`);
+        const uploadResult = await uploadString(storageRef, photoDataUri, 'data_url');
+        const imageUrl = await getDownloadURL(uploadResult.ref);
+ 4f36eae (remove the 2.details section and keep the first section also make it wor)
         const imageHint = anomalyType.toLowerCase();
 
         await addDoc(collection(db, "reports"), {
