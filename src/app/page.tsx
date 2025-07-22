@@ -3,32 +3,15 @@ import { ReportList } from '@/components/report-list';
 import type { Report } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Trophy, Zap, Users } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore';
-import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
 
-async function getReports(): Promise<Report[]> {
-  const reportsCol = collection(db, 'reports');
-  const reportsQuery = query(reportsCol, orderBy('reportedAt', 'desc'), limit(10));
-  const reportSnapshot = await getDocs(reportsQuery);
-  
-  const reports: Report[] = reportSnapshot.docs.map(doc => {
-    const data = doc.data();
-    const reportedAtDate = data.reportedAt.toDate();
-    return {
-      id: doc.id,
-      title: data.title,
-      description: data.description,
-      imageUrl: data.imageUrl,
-      imageHint: data.imageHint,
-      type: data.type,
-      status: data.status,
-      reportedAt: formatDistanceToNow(reportedAtDate) + ' ago',
-    } as Report;
-  });
-
-  return reports;
-}
+const placeholderReports: Report[] = [
+    { id: '1', title: 'Pothole on Elm Street', description: 'A large pothole is causing issues for drivers.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'pothole road', type: 'Pothole', status: 'Resolved', reportedAt: '2 days ago' },
+    { id: '2', title: 'Graffiti on Park Wall', description: 'Spray paint graffiti was found on the main park wall near the entrance.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'graffiti wall', type: 'Graffiti', status: 'In Progress', reportedAt: '5 hours ago' },
+    { id: '3', title: 'Broken Streetlight', description: 'The streetlight at the corner of 5th and Main is out.', imageUrl: 'https://placehold.co/600x400.png', imageHint: 'streetlight dark', type: 'Broken Streetlight', status: 'Received', reportedAt: '1 day ago' },
+];
 
 const achievements = [
     { icon: Trophy, value: '1,200+', label: 'Anomalies Resolved' },
@@ -36,14 +19,27 @@ const achievements = [
     { icon: Users, value: '5,000+', label: 'Community Reporters' },
 ];
 
-export default async function Home() {
-  const reports = await getReports();
+export default function Home() {
+  const reports = placeholderReports;
 
   return (
     <div className="space-y-12">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold tracking-tight mb-4">Improve Your City, One Report at a Time</h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            Our platform empowers you to report civic issues like potholes and graffiti in real-time. Join thousands of community members making a difference.
+        </p>
+        <Button asChild size="lg">
+          <Link href="/report">
+            <PlusCircle className="mr-2" />
+            Report an Anomaly
+          </Link>
+        </Button>
+      </div>
+
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Community Reports</h2>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mb-6">
           Browse recent anomalies reported by the community.
         </p>
         <ReportList reports={reports} />
@@ -69,5 +65,3 @@ export default async function Home() {
     </div>
   );
 }
-
-export const revalidate = 60; // Re-fetch data every 60 seconds
