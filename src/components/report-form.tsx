@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +28,7 @@ const anomalyTypes: { type: AnomalyType; icon: React.ElementType; label: string 
 ];
 
 const reportSchema = z.object({
-  image: z.instanceof(FileList).refine(files => files?.length > 0, 'An image is required.'),
+  image: z.any().refine(value => value?.length > 0, 'An image is required.'),
   anomalyType: z.string().refine(value => !!value, { message: 'Please select an anomaly type.' }),
 });
 
@@ -41,11 +41,33 @@ export function ReportForm() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string[] | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+      }
+    };
+
+    getCameraPermission();
+  }, []);
+
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
     defaultValues: {
       anomalyType: '',
+      image: null,
     },
   });
   
@@ -104,6 +126,31 @@ export function ReportForm() {
     }
   };
   
+  const handleCapture = () => {
+    if (videoRef.current) {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = video.current.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+            const dataUri = canvas.toDataURL('image/jpeg');
+            setImagePreview(dataUri);
+
+            // Trigger analysis
+            setIsAnalyzing(true);
+            runAnalysis(dataUri)
+                .then(result => setAnalysisResult(result.anomalies))
+                .catch(() => toast({ variant: 'destructive', title: "AI Analysis Failed", description: "Could not analyze the image." }))
+                .finally(() => setIsAnalyzing(false));
+            
+            // Set value for form validation
+            form.setValue('image', dataUri, { shouldValidate: true });
+        }
+    }
+  };
+
+
   return (
     <Card>
       <Form {...form}>
@@ -112,7 +159,7 @@ export function ReportForm() {
             <div className="space-y-2">
               <h3 className="text-lg font-medium">1. Anomaly Photo</h3>
               <p className="text-sm text-muted-foreground">
-                Upload a photo. Our AI will analyze the issue.
+                Upload a photo, or use your camera. Our AI will analyze the issue.
               </p>
               <FormField
                 control={form.control}
@@ -120,31 +167,50 @@ export function ReportForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                        <div
-                            className="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted transition-colors"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            {imagePreview ? (
-                                <Image src={imagePreview} alt="Anomaly preview" fill className="rounded-lg object-contain p-2" />
-                            ) : (
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-muted-foreground">
-                                    <Camera className="w-10 h-10 mb-3" />
-                                    <p className="mb-2 text-sm">Click to upload a photo</p>
-                                    <p className="text-xs">PNG, JPG or GIF</p>
-                                </div>
+                        <div className="space-y-4">
+                            <div
+                                className="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted transition-colors"
+                                onClick={() => !imagePreview && fileInputRef.current?.click()}
+                            >
+                                {imagePreview ? (
+                                    <Image src={imagePreview} alt="Anomaly preview" fill className="rounded-lg object-contain p-2" />
+                                ) : (
+                                  <>
+                                    <video ref={videoRef} className="w-full h-full object-cover rounded-md" autoPlay muted playsInline/>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white">
+                                        <Camera className="w-10 h-10 mb-3" />
+                                        <p className="mb-2 text-sm">Click to upload a photo</p>
+                                    </div>
+                                  </>
+                                )}
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    capture="environment"
+                                    className="hidden"
+                                    ref={fileInputRef}
+                                    onBlur={field.onBlur}
+                                    name={field.name}
+                                    onChange={(e) => {
+                                      field.onChange(e.target.files);
+                                      handleImageChange(e);
+                                    }}
+                                />
+                            </div>
+                            { hasCameraPermission === false && (
+                                <Alert variant="destructive">
+                                          <AlertTitle>Camera Access Required</AlertTitle>
+                                          <AlertDescription>
+                                            Please allow camera access to use this feature. You can still upload a photo manually.
+                                          </AlertDescription>
+                                  </Alert>
                             )}
-                            <Input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                ref={fileInputRef}
-                                onBlur={field.onBlur}
-                                name={field.name}
-                                onChange={(e) => {
-                                  field.onChange(e.target.files);
-                                  handleImageChange(e);
-                                }}
-                            />
+                            <div className="flex justify-center">
+                                <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission}>
+                                    <Camera className="mr-2" />
+                                    Capture Photo
+                                </Button>
+                            </div>
                         </div>
                     </FormControl>
                     <FormMessage />
@@ -216,3 +282,5 @@ export function ReportForm() {
     </Card>
   );
 }
+
+    
