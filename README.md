@@ -3,7 +3,9 @@ Civic Anomaly Detector
 This is a Next.js application that leverages AI to detect urban anomalies from user-uploaded images. It provides real-time analysis, suggests solutions, and offers contact information for relevant authorities, empowering citizens to help improve their communities.
 
 
-Civic Anomaly Detector Screenshot ![Uploading Screenshot 2025-07-22 231044.png…]()
+Civic Anomaly Detector Screenshot 
+<img width="1607" height="913" alt="Screenshot 2025-07-22 231044" src="https://github.com/user-attachments/assets/65fb340f-c060-4388-b0b8-1db785f63efa" />
+
 
 
 Features
