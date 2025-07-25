@@ -4,26 +4,40 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Loader2, CheckCircle, XCircle, Upload, Phone, Mail, Link as LinkIcon, Twitter } from 'lucide-react';
+<<<<<<< HEAD
 import Link from 'next/link';
+=======
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+<<<<<<< HEAD
 import { detectAnomaly, DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
+=======
+import { detectAnomaly, type DetectAnomalyOutput } from '@/ai/flows/detect-anomaly-flow';
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 
 export function ReportForm() {
   const { toast } = useToast();
+<<<<<<< HEAD
+=======
+  const fileInputRef = useRef<HTMLInputElement>(null);
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<DetectAnomalyOutput | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+<<<<<<< HEAD
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+=======
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -48,7 +62,11 @@ export function ReportForm() {
       reader.readAsDataURL(file);
     }
   };
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
   return (
     <>
       <Card>
@@ -78,7 +96,10 @@ export function ReportForm() {
                   className="hidden"
                   ref={fileInputRef}
                   onChange={handleImageChange}
+<<<<<<< HEAD
                   // Reset file input to allow re-uploading the same file
+=======
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
                   onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
                 />
               </div>
@@ -93,7 +114,11 @@ export function ReportForm() {
             <DialogDescription>Please wait while we process the image.</DialogDescription>
           </DialogHeader>
           {isAnalyzing ? (
+<<<<<<< HEAD
             <div className="flex items-center space-x-4">
+=======
+            <div className="flex items-center space-x-4 py-8">
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
                 <Loader2 className="mr-2 h-6 w-6 animate-spin" />
                 <p>Analyzing...</p>
             </div>

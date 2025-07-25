@@ -1,8 +1,20 @@
+<<<<<<< HEAD
 Civic Anomaly Detector
 
 This is a Next.js application that leverages AI to detect urban anomalies from user-uploaded images. It provides real-time analysis, suggests solutions, and offers contact information for relevant authorities, empowering citizens to help improve their communities.
 
 Civic Anomaly Detector Screenshot <img width="1607" height="913" alt="image" src="https://github.com/user-attachments/assets/fa8d0c88-f56b-49f6-af70-0b67a8d6bcfb" />
+=======
+Civic Anomaly Detector 
+
+This is a Next.js application that leverages AI to detect urban anomalies from user-uploaded images. It provides real-time analysis, suggests solutions, and offers contact information for relevant authorities, empowering citizens to help improve their communities.
+
+
+Civic Anomaly Detector Screenshot 
+<img width="1607" height="913" alt="Screenshot 2025-07-22 231044" src="https://github.com/user-attachments/assets/65fb340f-c060-4388-b0b8-1db785f63efa" />
+
+
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
 
 Features
 
@@ -35,9 +47,12 @@ An active Google AI API key. You can get one from [Google AI Studio](https://ais
 
 Installation
 
+<<<<<<< HEAD
 Civic-Anomaly-Detector
 
 
+=======
+>>>>>>> f81069a0acac47bd7d74ae405306fadba168e8a8
 1.  Clone the repository:
     ```bash
     git clone https://github.com/your-username/civic-anomaly-detector.git
