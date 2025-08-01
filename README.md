@@ -1,6 +1,6 @@
 
 
-Civic Anomaly Detector 
+Civic Anomaly Detector - https://civic-anomaly-detector.vercel.app/
 
 This is a Next.js application that leverages AI to detect urban anomalies from user-uploaded images. It provides real-time analysis, suggests solutions, and offers contact information for relevant authorities, empowering citizens to help improve their communities.
 
