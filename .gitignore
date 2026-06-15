@@ -1,0 +1,65 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Vercel
+.vercel
+
+#-*-*-*-*-*-*-*-*-*--
+# JetBrains specific
+# see https://www.jetbrains.com/help/idea/ignoring-files.html
+# -*-*-*-*-*-*-*-*-*--
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/contentModel.xml
+.idea/**/credentials.xml
+.idea/**/proxy.xml
+.idea/**/lifecycle.xml
+.idea/**/modules.xml
+.idea/**/vcs.xml
+.idea/**/gradle.xml
+.idea/**/libraries
+.idea/**/caches
+# Sensitive or heavyweight stuff
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+# Gradle
+.gradle
+/build/
+
+# Local History
+.history
+
+# Env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
